@@ -50,7 +50,8 @@ export default class TodoContainter extends React.Component {
         let todos = JSON.parse(currentLocalData);
         let todoData = [{title:this.state.title,description:this.state.description,createdAt:now,updatedAt:'', editable:false}];
         if(todos == null) {
-        let todos = [...this.state.todos,...todoData]
+        let stateTodos = this.state.todos !== null?this.state.todos : []
+        let todos = [...stateTodos,...todoData]
          localStorage.setItem("todos", JSON.stringify(todos));
          this.setState({title:'',description:'',todos:todos})
         }
@@ -93,7 +94,7 @@ export default class TodoContainter extends React.Component {
   }
 
     render() {
-     const {todos} = this.state
+    let todos = this.state.todos !== null? this.state.todos : []
       return (
        <div>
           <label>Create Todos</label>
