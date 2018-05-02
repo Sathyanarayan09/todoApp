@@ -72,8 +72,8 @@ export default class TodoContainter extends React.Component {
   saveEditedTodo(index) {
     let todos = [...this.state.todos]
     let now = moment(new Date()).format('MMM d, hh:mm');
-    todos[index].title = this.state.editTitle
-    todos[index].description = this.state.editDescription
+    todos[index].title = this.state.editTitle !== ''? this.state.editTitle : todos[index].title
+    todos[index].description = this.state.editDescription !== ''? this.state.editDescription : todos[index].description
     todos[index].editable = !todos[index].editable
     todos[index].updatedAt = now
     localStorage.setItem("todos", JSON.stringify(todos));
@@ -101,7 +101,7 @@ export default class TodoContainter extends React.Component {
          <form onSubmit={this.handleSubmit}>
             <input placeholder='Title' type="text" value={this.state.title} onChange={this.handleChangeTitle} />
             <input placeholder='Description' type="text" value={this.state.description} onChange={this.handleChangeDes} />
-            <input type="submit" value="Submit" />
+            <input type="submit" value="Add" />
         </form>
           {
              todos.map((item,index) =>{
