@@ -1,6 +1,9 @@
 import React from 'react'
 import './todoContainer.css';
+import { Icon } from 'semantic-ui-react'
+import {TodoDetails} from './todoDetailsComponent'
 const moment = require('moment');
+const currentDateTime = moment(new Date()).format('MMM d, hh:mm');
 
 export default class TodoContainter extends React.Component {
   constructor(props) {
@@ -8,47 +11,41 @@ export default class TodoContainter extends React.Component {
       this.state = {
         title: '',
         description:'',
-        refresh:'',
         todos:[],
-        editTodo:false,
         editTitle:'',
-        editDescription:''
-
+        editDescription:'',
+        showAll:true,
+        done:false,
+        unDone:false
       };
-
-      this.handleChangeTitle = this.handleChangeTitle.bind(this);
-      this.handleChangeDes = this.handleChangeDes.bind(this);
-      this.handleSubmit = this.handleSubmit.bind(this);
-      this.handleSaveChangeTitle = this.handleSaveChangeTitle.bind(this)
     }
    componentWillMount() {
      let currentLocalData = localStorage.getItem("todos");
      let todos = JSON.parse(currentLocalData);
      this.setState({todos:todos})
    }
-    handleChangeTitle(event) {
-
+    handleChangeTitle = (event)=> {
       this.setState({title: event.target.value});
     }
-    handleChangeDes(event) {
 
+    handleChangeDes = (event) =>{
       this.setState({description: event.target.value});
     }
-    removeTodo(index) {
+
+    removeTodo = (index)=>{
       let currentLocalData = localStorage.getItem("todos");
       let todos = JSON.parse(currentLocalData);
       todos.splice(index,1)
       localStorage.setItem("todos", JSON.stringify(todos));
-      this.setState({refresh:'',todos:todos})
+      this.setState({todos:todos})
     }
 
-    handleSubmit(event) {
+    handleSubmit = (event) =>{
       event.preventDefault();
       if((this.state.title !== '' && this.state.title.trim() !=='') && (this.state.description !== '' && this.state.description.trim() !=='')){
-        let now = moment(new Date()).format('MMM d, hh:mm');
         let currentLocalData = localStorage.getItem("todos");
         let todos = JSON.parse(currentLocalData);
-        let todoData = [{title:this.state.title,description:this.state.description,createdAt:now,updatedAt:'', editable:false}];
+        let todoData = [{title:this.state.title,description:this.state.description,createdAt:currentDateTime,updatedAt:'', editable:false, status:'undone'}];
         if(todos == null) {
         let stateTodos = this.state.todos !== null?this.state.todos : []
         let todos = [...stateTodos,...todoData]
@@ -64,71 +61,80 @@ export default class TodoContainter extends React.Component {
       }
 
     }
-    onClickTodo(index) {
+
+    onClickTodo =(index)=> {
       let todos = [...this.state.todos]
       todos[index].editable = !todos[index].editable
       this.setState({todos:todos})
     }
-  saveEditedTodo(index) {
-    let todos = [...this.state.todos]
-    let now = moment(new Date()).format('MMM d, hh:mm');
-    todos[index].title = this.state.editTitle !== ''? this.state.editTitle : todos[index].title
-    todos[index].description = this.state.editDescription !== ''? this.state.editDescription : todos[index].description
-    todos[index].editable = !todos[index].editable
-    todos[index].updatedAt = now
-    localStorage.setItem("todos", JSON.stringify(todos));
-    this.setState({todos:todos})
 
-  }
-  handleSaveChangeTitle (text,index) {
-    this.setState({editTitle:text.target.value})
-  }
-  handleSaveChangeDescription(text,index) {
-    this.setState({editDescription:text.target.value})
-  }
+    saveEditedTodo = (index)=>{
+      let todos = [...this.state.todos]
+      todos[index].title = this.state.editTitle !== ''? this.state.editTitle : todos[index].title
+      todos[index].description = this.state.editDescription !== ''? this.state.editDescription : todos[index].description
+      todos[index].editable = !todos[index].editable
+      todos[index].updatedAt = currentDateTime
+      localStorage.setItem("todos", JSON.stringify(todos));
+      this.setState({todos:todos})
 
-  undoEdit(index) {
-    let todos = [...this.state.todos]
-    todos[index].editable = !todos[index].editable
-    this.setState({todos:todos})
-  }
+    }
 
-    render() {
-    let todos = this.state.todos !== null? this.state.todos : []
+    handleSaveChangeTitle = (text,index)=> {
+      this.setState({editTitle:text.target.value})
+    }
+
+    handleSaveChangeDescription = (text,index)=> {
+      this.setState({editDescription:text.target.value})
+    }
+
+    undoEdit = (index)=> {
+      let todos = [...this.state.todos]
+      todos[index].editable = !todos[index].editable
+      this.setState({todos:todos})
+    }
+
+    completedTodo = (index)=>{
+      let todos = [...this.state.todos]
+      todos[index].status = 'done'
+      this.setState({todos:todos})
+      localStorage.setItem("todos", JSON.stringify(todos));
+    }
+
+  render() {
+    let todos = this.state.todos !== null? this.state.todos.filter((item) =>{
+      if(this.state.showAll){
+        return item.status === 'done'|| item.status === 'undone'
+      } else if(this.state.done) {
+        return item.status === 'done'
+      } else {
+        return item.status === 'undone'
+      }
+    }) : []
+
       return (
        <div>
-          <label>Create Todos</label>
+         <label>Create Todos</label>
          <form onSubmit={this.handleSubmit}>
             <input placeholder='Title' type="text" value={this.state.title} onChange={this.handleChangeTitle} />
             <input placeholder='Description' type="text" value={this.state.description} onChange={this.handleChangeDes} />
             <input type="submit" value="Add" />
         </form>
-          {
-             todos.map((item,index) =>{
-              return (
-              <div key={index} className="details">
-                <div style={{display:'flex',flexDirection:'row'}}>
-                  {   item.editable?
-                      <input placeholder='Title' type="text" onChange={(text) =>this.handleSaveChangeTitle(text,index)} />:
-                      <label onClick={()=> this.onClickTodo(index)} style={{flex:3}}>Title: {item.title} </label>
-                  }
-                  <label style={{flex:2}}>{item.updatedAt?item.updatedAt:item.createdAt} </label>
-                  {item.editable?
-                    <div>
-                      <button onClick={()=> this.saveEditedTodo(index)}>Save</button>
-                      <button onClick={()=> this.undoEdit(index)}>Undo</button>
-                    </div>:<button onClick={()=> this.removeTodo(index)}>X</button>}
-                </div>
-                {   item.editable?
-                    <input placeholder='Description' type="text"  onChange={(text) =>this.handleSaveChangeDescription(text,index)} />:
-                    <label>Description: {item.description} </label>
-                }
+         <TodoDetails todos={todos}
+                      removeTodo={this.removeTodo}
+                      handleSaveChangeTitle={this.handleSaveChangeTitle}
+                      saveEditedTodo={this.saveEditedTodo}
+                      undoEdit={this.undoEdit}
+                      handleSaveChangeDescription={this.handleSaveChangeDescription}
+                      onClickTodo={this.onClickTodo}
+                      completedTodo={this.completedTodo}/>
 
-              </div>
-              )
-            })
-          }
           <div>{todos == '' ? <label>Todo is empty</label>:null}</div>
+          <div style={{marginTop:20}}>
+            <label>Filters: <a onClick={()=> this.setState({showAll:!this.state.showAll, done:false, unDone:false})}> <span style={this.state.showAll?{textDecoration: 'underline'}:null}>Show All</span></a>
+                            <a onClick={()=> this.setState({done:!this.state.done, showAll:false, unDone:false })}> <span style={this.state.done?{textDecoration: 'underline'}:null}>Done</span> </a>
+                            <a onClick={()=> this.setState({unDone:!this.state.unDone, showAll:false, done:false})}> <span style={this.state.unDone?{textDecoration: 'underline'}:null}>Undone</span> </a>
+            </label>
+          </div>
        </div>
 
       );

@@ -4,8 +4,10 @@
 }
 
 .details {
+  margin-top: 15px;
+  border-radius: 10px;
   padding: 10px;
   border-style: solid;
   border-width: thin;
- 
+  box-shadow: 5px 10px #888888;
 }
