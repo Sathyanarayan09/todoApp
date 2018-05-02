@@ -1,8 +1,7 @@
 import React from 'react'
 import './todoContainer.css';
 import { Icon } from 'semantic-ui-react'
-const moment = require('moment');
-const currentDateTime = moment(new Date()).format('MMM d, hh:mm');
+
 
 export const TodoDetails = props => {
   const {todos,
@@ -27,7 +26,7 @@ export const TodoDetails = props => {
             <label style={{marginRight:20,fontSize:10}}>{item.updatedAt?item.updatedAt:item.createdAt} </label>
             {item.editable?
               <div>
-                <Icon onClick={()=> saveEditedTodo(index)} name='save' />
+                <Icon  onClick={()=> saveEditedTodo(index)} name='save' />
                 <Icon  onClick={()=> undoEdit(index)} name='undo' />
               </div>:
               <div>
