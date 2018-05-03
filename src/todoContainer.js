@@ -1,6 +1,6 @@
 import React from 'react'
 import './todoContainer.css';
-import {TodoDetails} from './todoDetailsComponent'
+import {TodoDetails} from './todoDetails'
 const moment = require('moment');
 const currentDateTime = moment(new Date()).format('MMM d, hh:mm');
 
