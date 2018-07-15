@@ -3,11 +3,12 @@ import './todoContainer.css';
 import {TodoDetails} from './todoDetails'
 import { Link } from 'react-router-dom';
 import { Icon } from 'semantic-ui-react'
-
+import {addTodo} from './action'
+import { connect } from 'react-redux'
 const moment = require('moment');
 const currentDateTime = moment(new Date()).format('MMM d, hh:mm');
 
-export default class CreateTodo extends React.Component {
+ class CreateTodo extends React.Component {
   constructor(props) {
     super(props);
       this.state = {
@@ -24,7 +25,7 @@ export default class CreateTodo extends React.Component {
   componentWillMount() {
      let currentLocalData = localStorage.getItem("todos");
      let todos = JSON.parse(currentLocalData);
-     this.setState({todos:todos})
+     this.setState({todos:todos? todos : []})
    }
 
   handelChangesInput (text,type) {
@@ -34,13 +35,20 @@ export default class CreateTodo extends React.Component {
   handleSubmit = (event) =>{
       event.preventDefault();
       if((this.state.title !== '' && this.state.title.trim() !=='') && (this.state.description !== '' && this.state.description.trim() !=='')){
-        let currentLocalData = localStorage.getItem("todos");
-        let todos = JSON.parse(currentLocalData);
-        let todoData = [{title:this.state.title,description:this.state.description,createdAt:currentDateTime,updatedAt:'', editable:false, status:'undone'}];
+        // let currentLocalData = localStorage.getItem("todos");
+        // let todos = JSON.parse(currentLocalData);
+        // let todoData = [{title:this.state.title,description:this.state.description,createdAt:currentDateTime,updatedAt:'', editable:false, status:'undone'}];
 
-        let Savetodos = [...this.state.todos,...todoData]
-        localStorage.setItem("todos", JSON.stringify(Savetodos));
-        this.setState({description: '', title: '', todos:Savetodos})
+        // let Savetodos = [...this.state.todos,...todoData]
+        // localStorage.setItem("todos", JSON.stringify(Savetodos));
+        // this.setState({description: '', title: '', todos:Savetodos})
+        let todoObject = {
+          title:this.state.title,
+          description:this.state.description,
+          createdAt:currentDateTime,
+        }
+        this.props.dispatch(addTodo(todoObject))
+
         this.props.history.push("/");
       } else {
         this.setState({message:'Title or description missing',save:true})
@@ -51,8 +59,6 @@ export default class CreateTodo extends React.Component {
 
 
   render() {
-
-
   return (
       <div className="editTodoCard">
         <label style={{display:'flex', justifyContent:'center'}}>Add Todo | Home <Link to={'/'}><Icon name='home' /></Link></label>
@@ -68,3 +74,12 @@ export default class CreateTodo extends React.Component {
       );
     }
 }
+
+const mapStateToProps = (state) => {
+  return {
+  item: state
+  }
+}
+
+
+export default connect(mapStateToProps)(CreateTodo);

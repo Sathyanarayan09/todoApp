@@ -3,11 +3,11 @@ import './todoContainer.css';
 import './todoContainer.css';
 import {TodoDetails} from './todoDetails'
 import { Link } from 'react-router-dom';
-
+import { connect } from 'react-redux'
 const moment = require('moment');
 const currentDateTime = moment(new Date()).format('MMM d, hh:mm');
 
-export default class DisplayTodos extends React.Component {
+class DisplayTodos extends React.Component {
   constructor(props) {
     super(props);
       this.state = {
@@ -29,7 +29,7 @@ export default class DisplayTodos extends React.Component {
   }
 
   render() {
-    let todos = this.state.todos !== null? this.state.todos.filter((item) =>{
+    let todos = this.props.todoItem.todos !== null? this.props.todoItem.todos.filter((item) =>{
       if(this.state.showAll){
         return true
       } else if(this.state.done) {
@@ -73,3 +73,11 @@ export default class DisplayTodos extends React.Component {
       );
     }
 }
+
+const mapStateToProps = (state) => {
+  return  {
+    todoItem: state
+  }
+}
+
+export default connect(mapStateToProps)(DisplayTodos);

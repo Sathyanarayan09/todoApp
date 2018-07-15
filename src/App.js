@@ -7,11 +7,11 @@ class App extends Component {
   render() {
     return (
       <div className="center-div">
-        <h3>The Todos App</h3>
+        <h3>To-do App</h3>
            <Link to="/createTodo">
               <button>Create Todo</button>
             </Link>
-        <DisplayTodos/>    
+        <DisplayTodos/>
       </div>
     );
   }
